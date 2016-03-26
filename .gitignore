@@ -56,3 +56,4 @@ EnableMBRDebug.txt
 # Release files
 LastVersion*.txt
 TestVersion*.txt
+.idea/

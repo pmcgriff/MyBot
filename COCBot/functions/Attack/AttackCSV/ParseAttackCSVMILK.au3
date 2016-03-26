@@ -101,7 +101,7 @@ Func ParseAttackCSVMILK($value1 = "M", $value2 = 1, $value3 = 6, $value4 = "gobl
 				$iNbrOfDetectedDrills[$iMatchMode] += UBound($PixelDarkElixir)
 			EndIf
 ; +++++++++++++legion123 new code
-			If ($value1 = "TH") and ($TestLoots = False) Then
+			If ($value1 = "TH") Then ;and ($TestLoots = False) Then  ;Modified by ChifMan
 				THSearch() ;thanks to @LKhjks
 				SetLog("Get Location of TH...")
 				Local $tmpArrayOfPixel[1]
@@ -189,6 +189,8 @@ Func ParseAttackCSVMILK($value1 = "M", $value2 = 1, $value3 = 6, $value4 = "gobl
 
 			Local $troopMilk3 = -1
 			Local $troopMilk4 = -1
+			Local $troopMilk3Out = 0  ;Chifman
+			Local $troopMilk4Out = 0  ;Chifman
 			
 			For $i = 0 To UBound($atkTroops) - 1
 				If $atkTroops[$i][0] = $troopMilk1 Then
@@ -207,13 +209,33 @@ Func ParseAttackCSVMILK($value1 = "M", $value2 = 1, $value3 = 6, $value4 = "gobl
 					Local $arrPixel = $listInfoPixelDropTroop[$i]
 					debugRedArea("$arrPixel $UBound($arrPixel) : [" & UBound($arrPixel) & "] ")
 					If UBound($arrPixel) > 0 Then
-						SelectDropTroop($troopMilk3)
-						Local $pixel = $arrPixel[0]
-; noyax decrease time				If IsAttackPage() Then Click($pixel[0], $pixel[1], $number, $iDelayDropOnPixel2, "#0096")
-						Click($pixel[0], $pixel[1], Number($value3), 50, "#0096")
+						if ReadTroopQuantity($troopMilk3) > 0 Then						
+							SelectDropTroop($troopMilk3)
+							Local $pixel = $arrPixel[0]
+	; noyax decrease time				If IsAttackPage() Then Click($pixel[0], $pixel[1], $number, $iDelayDropOnPixel2, "#0096")
+							Click($pixel[0], $pixel[1], Number($value3), 50, "#0096")
+							;ChifMan Added to use All Troops Subs Secondary Troop if Primary is out
+							If $troopMilk4Out = 1 Then
+								SetLog("Substituting empty troop...")
+								SetLog(NameOfTroop($troopMilk4) & " Replaced.")
+								Click($pixel[0], $pixel[1], Number($value3), 50, "#0096")
+							EndIf
+						Else
+							$troopMilk3Out = 1
+						EndIf							
 						if $troopsmilk = 2 then
-							SelectDropTroop($troopMilk4)
-							click($Pixel[0], $Pixel[1], Number($value13), 50, "#0096")
+							If ReadTroopQuantity($troopMilk4) > 0 Then
+								SelectDropTroop($troopMilk4)
+								click($Pixel[0], $Pixel[1], Number($value13), 50, "#0096")
+								;ChifMan Added to use All Troops Subs Secondary Troop if Primary is out
+								If $troopMilk3Out = 1 Then
+									SetLog("Substituting empty troop...")
+									SetLog(NameOfTroop($troopMilk3) & " Replaced.")
+									click($Pixel[0], $Pixel[1], Number($value13), 50, "#0096")
+								EndIf
+							Else
+								$troopMilk4Out = 1
+							EndIf		
 						EndIf
 					EndIf
 					If _Sleep($iDelayDropOnPixel1) Then Return
